@@ -1,12 +1,33 @@
 # spytorch
 ## Developed from 
-- Cadene's [bootstrap.pytorch](https://github.com/Cadene/bootstrap.pytorch)
-- KaihuaTang's [VQA2.0's Recent Approaches](https://github.com/KaihuaTang/VQA2.0-Recent-Approachs-2018.pytorch)
+- Cadene's [bootstrap.pytorch](https://github.com/Cadene/bootstrap.pytorch) 
+- KaihuaTang's [VQA2.0's Recent Approaches](https://github.com/KaihuaTang/VQA2.0-Recent-Approachs-2018.pytorch) 
+- Cyanogenoid's [vqa-counting](https://github.com/Cyanogenoid/vqa-counting/tree/master/vqa-v2) 
 
 ## Workflow
+Most common steps:
+- train and eval: select hyperparameters
+```bash
+# train on train dataset; eval on val dataset
+python main.py
+```
+- train: train on more data
+```bash
+# train on train and val dataset; --train means no validation during train
+python main.py --train --train_split=trainval
+```
+- val: this step can be skipped
+```bash
+python main.py --val 
+```
+- test: test on test dataset if exists
+```bash
+python main.py --test --test_split=test
+```
+
 ### Train
-```python
-# default (config/config.py)
+```bash
+# default train and val (config/config.py)
 python main.py
 
 # specify config file (config/config_sgd.py)
@@ -15,6 +36,8 @@ python main.py --conf config_sgd
 # resume
 python main.py --conf config_sgd --resume
 
+# use --train to only train
+python main.py --train
 ```
 
 ### Evaluation
@@ -79,3 +102,18 @@ plot_names  = ['visualization.tsne'] # plots
 - Criterion/Loss
 - Metrics
 - Optimizer
+
+
+### Stages Summary
+#### train
+- dataset: train|trainval
+- criterion: loss
+- output: model
+
+#### val
+- dataset: val|train
+- output: pred_label_file, accuracy 
+
+#### test
+- dataset: test|val|train
+- output: pred_label_file
