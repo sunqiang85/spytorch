@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
-
+import os
 
 class Net(nn.Module):
     def __init__(self, config):
@@ -25,3 +25,5 @@ class Net(nn.Module):
         x = self.fc2(x)
         prob_dist=F.log_softmax(x, dim=1)
         return {'prob_dist': prob_dist}
+
+

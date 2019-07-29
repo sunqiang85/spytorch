@@ -1,5 +1,10 @@
 import torch
-
+import torch.nn as nn
+from torchvision import transforms
+import importlib
+import os
+import cv2
+import numpy as np
 
 def batch_accuracy(logits, labels):
     """
@@ -99,3 +104,39 @@ class Tracker:
             else:
                 m = self.momentum
                 self.value = m * self.value + (1 - m) * value
+
+
+def getNet(config):
+    net_module = importlib.import_module(config.model_name)
+    net = net_module.Net(config)
+    model = nn.DataParallel(net).cuda()
+    model_path = os.path.join(config.exp_dir, 'ckpt_best_accuracy_top1_model.pth')
+    model_dict = torch.load(model_path)
+    model.load_state_dict(model_dict)
+    return model
+
+
+def predict(model, image, isFile=True):
+    if isFile:
+        image = cv2.imread(image)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        image = cv2.resize(image, (28, 28))
+        image = image[:,:,np.newaxis] # H,W,C ->ToTensor->C,H,W
+        item_tf = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.1307,), (0.3081,))
+        ])
+        image = item_tf(image)
+        image = image.unsqueeze(0) # C,H,W -> batch,C,H,W
+        model.eval()
+        image.cuda()
+        print(type(model))
+        print(type(model.module))
+        with torch.no_grad():
+            result=model(image)
+        logp=result['prob_dist'].squeeze(0)
+        prob=np.exp(logp.cpu().numpy())
+        return prob
+
+
+

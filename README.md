@@ -50,6 +50,11 @@ python main.py --conf config_sgd --eval
 
 ```
 
+### Deploy on Flask
+```bash
+sh runserver.sh
+```
+
 ## Docs for Program
 ### argparse & config
 - usiang argparse to load specify conf
